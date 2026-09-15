@@ -148,20 +148,24 @@ public class AgentCore {
                 context.getCurrentPackage()
         );
 
+        // Maintain message history in JSONArray
+        org.json.JSONArray messages = new org.json.JSONArray();
+        messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
+
         // Append selected text to user message if any
         String fullUserMessage = userMessage;
         if (context.hasSelectedText()) {
             fullUserMessage += "\n\n**Selected code:**\n```\n" + context.getSelectedText() + "\n```";
         }
+        messages.put(new JSONObject().put("role", "user").put("content", fullUserMessage));
 
         // ── ReAct loop ────────────────────────────────────────────────────
-        String currentMessage = fullUserMessage;
         for (int step = 0; step < MAX_STEPS; step++) {
             onStep.accept("Agent thinking... (step " + (step + 1) + "/" + MAX_STEPS + ")");
 
             String llmResponse;
             try {
-                llmResponse = LlamaClient.chat(systemPrompt, currentMessage);
+                llmResponse = LlamaClient.chat(messages);
             } catch (Exception e) {
                 onError.accept("[Error] LLM call failed: " + e.getMessage());
                 LOG.error("LLM call failed", e);
@@ -171,7 +175,13 @@ public class AgentCore {
             // ── Parse JSON from LLM response ──────────────────────────────
             JSONObject parsed = extractJson(llmResponse);
             if (parsed == null) {
-                // LLM didn't return valid JSON — treat the raw text as the answer
+                // If model failed to return valid JSON on early steps, nudge it to return JSON
+                if (step < 2) {
+                    messages.put(new JSONObject().put("role", "assistant").put("content", llmResponse));
+                    messages.put(new JSONObject().put("role", "user").put("content",
+                            "ERROR: You must respond ONLY with a valid JSON tool call. Example: {\"thought\": \"...\", \"tool\": \"read_file\", \"args\": {\"path\": \"...\"}}. Output the JSON now:"));
+                    continue;
+                }
                 onDone.accept(llmResponse.trim());
                 return;
             }
@@ -179,15 +189,12 @@ public class AgentCore {
             String toolName = parsed.optString("tool", "").trim().toLowerCase();
             JSONObject toolArgs = parsed.optJSONObject("args");
             if (toolArgs == null) {
-                if (parsed.has("parameters")) {
-                    toolArgs = parsed.optJSONObject("parameters");
-                } else if (parsed.has("arguments")) {
-                    toolArgs = parsed.optJSONObject("arguments");
-                }
+                if (parsed.has("parameters")) toolArgs = parsed.optJSONObject("parameters");
+                else if (parsed.has("arguments")) toolArgs = parsed.optJSONObject("arguments");
             }
             if (toolArgs == null) toolArgs = new JSONObject();
 
-            // Fallback: smaller models often put "tool" inside "args", or name it "action"/"name"
+            // Fallbacks for key names used by smaller models
             if (toolName.isEmpty() && toolArgs.has("tool")) {
                 toolName = toolArgs.optString("tool", "").trim().toLowerCase();
             }
@@ -201,36 +208,45 @@ public class AgentCore {
                 toolName = parsed.optString("function", "").trim().toLowerCase();
             }
 
-            // If args was empty, but top-level parsed object contains file args like 'path' or 'old_text'
             if (toolArgs.isEmpty() && (parsed.has("path") || parsed.has("old_text") || parsed.has("content") || parsed.has("query"))) {
                 toolArgs = parsed;
             }
 
+            // If the model produced thought but NO tool:
+            if (toolName.isEmpty()) {
+                // Did it explicitly provide an answer or text field?
+                String explicitAnswer = parsed.optString("answer", parsed.optString("text", parsed.optString("response", "")));
+                if (!explicitAnswer.isEmpty()) {
+                    onDone.accept(explicitAnswer);
+                    return;
+                }
+
+                // If it only outputted thought, do NOT terminate! Prompt it to specify the tool
+                if (step < MAX_STEPS - 1) {
+                    messages.put(new JSONObject().put("role", "assistant").put("content", llmResponse));
+                    messages.put(new JSONObject().put("role", "user").put("content",
+                            "You specified a 'thought', but did not provide 'tool' or 'args'. " +
+                            "To inspect or edit code, call 'read_file' or 'edit_file'. " +
+                            "To finish, call 'answer'. " +
+                            "Output format: {\"thought\": \"...\", \"tool\": \"edit_file\", \"args\": {\"path\": \"...\", \"old_text\": \"...\", \"new_text\": \"...\"}}"));
+                    continue;
+                }
+            }
+
             // Check if this is an answer or final response
-            boolean isAnswer = toolName.isEmpty()
-                    || "answer".equals(toolName)
+            boolean isAnswer = "answer".equals(toolName)
                     || "none".equals(toolName)
                     || "null".equals(toolName)
                     || "finish".equals(toolName)
                     || "final_answer".equals(toolName)
                     || "response".equals(toolName)
-                    || "message".equals(toolName)
-                    || (!tools.containsKey(toolName) && (parsed.has("response") || parsed.has("text") || parsed.has("answer")));
+                    || "message".equals(toolName);
 
             if (isAnswer) {
-                String answer = null;
-                if (toolArgs.has("text")) answer = toolArgs.optString("text");
-                else if (toolArgs.has("answer")) answer = toolArgs.optString("answer");
-                else if (toolArgs.has("response")) answer = toolArgs.optString("response");
-                else if (parsed.has("response")) answer = parsed.optString("response");
-                else if (parsed.has("answer")) answer = parsed.optString("answer");
-                else if (parsed.has("text")) answer = parsed.optString("text");
-                else if (parsed.has("thought")) answer = parsed.optString("thought");
-                else if (toolArgs.has("content")) answer = toolArgs.optString("content");
+                String answer = toolArgs.optString("text", toolArgs.optString("answer", toolArgs.optString("response", "")));
+                if (answer.isEmpty()) answer = parsed.optString("text", parsed.optString("answer", parsed.optString("response", "")));
+                if (answer.isEmpty()) answer = parsed.optString("thought", llmResponse.trim());
 
-                if (answer == null || answer.trim().isEmpty()) {
-                    answer = llmResponse.trim();
-                }
                 onDone.accept(answer);
                 return;
             }
@@ -238,17 +254,10 @@ public class AgentCore {
             // ── Execute tool ───────────────────────────────────────────────
             AgentTool tool = tools.get(toolName);
             if (tool == null) {
-                // Check if the model simply provided an answer in thought or response
-                String possibleAnswer = parsed.optString("thought",
-                        parsed.optString("response", toolArgs.optString("text", "")));
-                if (!possibleAnswer.trim().isEmpty() && toolArgs.isEmpty()) {
-                    onDone.accept(possibleAnswer);
-                    return;
-                }
-
-                // Give feedback to LLM to recover
-                currentMessage = "Tool '" + toolName + "' does not exist. Available tools: " +
-                        String.join(", ", tools.keySet()) + ", answer. If you have the answer, please use 'answer' tool.";
+                messages.put(new JSONObject().put("role", "assistant").put("content", llmResponse));
+                messages.put(new JSONObject().put("role", "user").put("content",
+                        "Tool '" + toolName + "' does not exist. Available tools: " +
+                        String.join(", ", tools.keySet()) + ", answer."));
                 continue;
             }
 
@@ -267,14 +276,15 @@ public class AgentCore {
             // For file modifications (write_file / edit_file), if execution succeeded with OK:,
             // terminate immediately without wasting another LLM generation roundtrip!
             if (("write_file".equals(toolName) || "edit_file".equals(toolName) || "create_file".equals(toolName) || "save_file".equals(toolName) || "replace".equals(toolName)) && toolResult != null && toolResult.startsWith("OK:")) {
-                String thoughtMsg = thought.isEmpty() ? "فایل با موفقیت ویرایش/ایجاد شد." : thought;
+                String thoughtMsg = thought.isEmpty() ? "تغییرات با موفقیت روی فایل اعمال شد." : thought;
                 onDone.accept(thoughtMsg + "\n\n" + toolResult);
                 return;
             }
 
-            // ── Feed result back to LLM ────────────────────────────────────
-            currentMessage = PromptBuilder.buildToolResultMessage(toolName, toolResult) +
-                             "\n\nOriginal request: " + fullUserMessage;
+            // ── Feed result back to LLM with full conversation history ───
+            messages.put(new JSONObject().put("role", "assistant").put("content", llmResponse));
+            messages.put(new JSONObject().put("role", "user").put("content",
+                    PromptBuilder.buildToolResultMessage(toolName, toolResult)));
         }
 
         onError.accept("Agent reached maximum steps (" + MAX_STEPS + ") without completing.");

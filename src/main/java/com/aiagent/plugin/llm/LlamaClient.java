@@ -25,17 +25,17 @@ public class LlamaClient {
     private static final Logger LOG = Logger.getInstance(LlamaClient.class);
 
     /**
-     * Send a prompt and return the full response (blocking).
+     * Send messages array and return the full response (blocking).
      * Must be called from a background thread.
      */
-    public static String chat(String systemPrompt, String userMessage) throws IOException {
+    public static String chat(JSONArray messages) throws IOException {
         PluginSettings.State cfg = PluginSettings.getInstance().getState();
         assert cfg != null;
 
         String endpoint = buildEndpoint(cfg);
         String modelName = cfg.useOllama ? cfg.ollamaModel : "local";
 
-        JSONObject body = buildRequestBody(modelName, systemPrompt, userMessage, cfg, false);
+        JSONObject body = buildRequestBody(modelName, messages, cfg, false);
 
         String raw = postJson(endpoint, body.toString());
         JSONObject json = new JSONObject(raw);
@@ -46,14 +46,20 @@ public class LlamaClient {
     }
 
     /**
-     * Send a prompt and stream the response token by token (SSE).
-     *
-     * @param onToken  Called with each text token as it streams
-     * @param onDone   Called with the full assembled response when done
+     * Send a prompt and return the full response (blocking).
+     */
+    public static String chat(String systemPrompt, String userMessage) throws IOException {
+        JSONArray messages = new JSONArray();
+        messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
+        messages.put(new JSONObject().put("role", "user").put("content", userMessage));
+        return chat(messages);
+    }
+
+    /**
+     * Send messages and stream the response token by token (SSE).
      */
     public static void chatStreaming(
-            String systemPrompt,
-            String userMessage,
+            JSONArray messages,
             Consumer<String> onToken,
             Consumer<String> onDone
     ) throws IOException {
@@ -63,7 +69,7 @@ public class LlamaClient {
         String endpoint = buildEndpoint(cfg);
         String modelName = cfg.useOllama ? cfg.ollamaModel : "local";
 
-        JSONObject body = buildRequestBody(modelName, systemPrompt, userMessage, cfg, true);
+        JSONObject body = buildRequestBody(modelName, messages, cfg, true);
         StringBuilder fullText = new StringBuilder();
 
         URL url = new URL(endpoint);
@@ -106,6 +112,21 @@ public class LlamaClient {
         onDone.accept(fullText.toString());
     }
 
+    /**
+     * Send a prompt and stream the response token by token (SSE).
+     */
+    public static void chatStreaming(
+            String systemPrompt,
+            String userMessage,
+            Consumer<String> onToken,
+            Consumer<String> onDone
+    ) throws IOException {
+        JSONArray messages = new JSONArray();
+        messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
+        messages.put(new JSONObject().put("role", "user").put("content", userMessage));
+        chatStreaming(messages, onToken, onDone);
+    }
+
     // ─────────────────────────── Private Helpers ─────────────────────────────
 
     /**
@@ -120,8 +141,7 @@ public class LlamaClient {
 
     private static JSONObject buildRequestBody(
             String model,
-            String systemPrompt,
-            String userMessage,
+            JSONArray messages,
             PluginSettings.State cfg,
             boolean stream
     ) {
@@ -132,9 +152,11 @@ public class LlamaClient {
         body.put("max_tokens", cfg.maxTokens);
         body.put("stream", stream);
 
-        JSONArray messages = new JSONArray();
-        messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
-        messages.put(new JSONObject().put("role", "user").put("content", userMessage));
+        // Force JSON response format
+        JSONObject responseFormat = new JSONObject();
+        responseFormat.put("type", "json_object");
+        body.put("response_format", responseFormat);
+
         body.put("messages", messages);
         return body;
     }
