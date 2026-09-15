@@ -21,6 +21,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.3</b>
+        <ul>
+            <li>Fixed context prune loop covering all tool responses and large messages</li>
+            <li>Direct num_ctx=16384 injection to Ollama endpoint ensuring large service classes load seamlessly</li>
+        </ul>
         <b>1.0.2</b>
         <ul>
             <li>Dynamic 16K context window allocation and CPU thread limits in Ollama</li>

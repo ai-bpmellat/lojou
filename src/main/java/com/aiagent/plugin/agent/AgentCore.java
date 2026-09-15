@@ -540,16 +540,15 @@ public class AgentCore {
     }
 
     /**
-     * Prunes older messages in history to fit context size when an exceed error occurs.
+     * Prunes older or large messages in history to fit context size when an exceed error occurs.
      */
     private void pruneMessages(org.json.JSONArray messages) {
-        int lastIdx = messages.length() - 1;
-        for (int i = 2; i < lastIdx; i++) {
+        for (int i = 1; i < messages.length(); i++) {
             JSONObject msg = messages.optJSONObject(i);
-            if (msg != null && "user".equals(msg.optString("role"))) {
+            if (msg != null) {
                 String c = msg.optString("content", "");
-                if (c.length() > 600) {
-                    msg.put("content", c.substring(0, 500) + "\n... [Output trimmed to fit context window] ...");
+                if (c.length() > 2000) {
+                    msg.put("content", c.substring(0, 1500) + "\n\n... [Content trimmed to fit context window] ...");
                 }
             }
         }
