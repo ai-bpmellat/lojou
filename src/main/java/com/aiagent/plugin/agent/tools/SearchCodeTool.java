@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class SearchCodeTool implements AgentTool {
 
-    private static final int MAX_RESULTS = 30;
+    private static final int MAX_RESULTS = 10;
 
     /** File extensions to search (text-based source files) */
     private static final List<String> SEARCHABLE_EXTENSIONS = List.of(

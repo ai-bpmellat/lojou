@@ -263,6 +263,15 @@ public class AgentCore {
 
             String toolResult = tool.execute(toolArgs, context.getProjectPath());
 
+            // ── Fast-Path Optimization ────────────────────────────────────
+            // For file modifications (write_file / edit_file), if execution succeeded with OK:,
+            // terminate immediately without wasting another LLM generation roundtrip!
+            if (("write_file".equals(toolName) || "edit_file".equals(toolName) || "create_file".equals(toolName) || "save_file".equals(toolName) || "replace".equals(toolName)) && toolResult != null && toolResult.startsWith("OK:")) {
+                String thoughtMsg = thought.isEmpty() ? "فایل با موفقیت ویرایش/ایجاد شد." : thought;
+                onDone.accept(thoughtMsg + "\n\n" + toolResult);
+                return;
+            }
+
             // ── Feed result back to LLM ────────────────────────────────────
             currentMessage = PromptBuilder.buildToolResultMessage(toolName, toolResult) +
                              "\n\nOriginal request: " + fullUserMessage;

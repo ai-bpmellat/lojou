@@ -19,7 +19,7 @@ public class BST<T extends Comparable<T>> {
         }
     }
 
-    private Node۳<T> root;
+    private Node<T> root;
 
     /**
      * Constructor for BST.

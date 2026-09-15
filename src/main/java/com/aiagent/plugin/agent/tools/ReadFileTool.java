@@ -26,10 +26,10 @@ public class ReadFileTool implements AgentTool {
 
         try {
             String content = new String(Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
-            // Truncate very large files to avoid exceeding context
-            if (content.length() > 8000) {
-                content = content.substring(0, 8000) +
-                          "\n\n... [TRUNCATED - file is " + content.length() + " chars total] ...";
+            // Truncate very large files to avoid exceeding context and speed up LLM processing
+            if (content.length() > 3500) {
+                content = content.substring(0, 3500) +
+                          "\n\n... [TRUNCATED for speed - file is " + content.length() + " chars total] ...";
             }
             return content;
         } catch (Exception e) {
