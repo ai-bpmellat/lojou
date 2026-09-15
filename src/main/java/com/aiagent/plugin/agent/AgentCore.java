@@ -160,6 +160,10 @@ public class AgentCore {
         messages.put(new JSONObject().put("role", "user").put("content", fullUserMessage));
 
         // ── ReAct loop ────────────────────────────────────────────────────
+        String lastThought = "";
+        String lastCallSig = "";
+        int repeatCount = 0;
+
         for (int step = 0; step < MAX_STEPS; step++) {
             onStep.accept("Agent thinking... (step " + (step + 1) + "/" + MAX_STEPS + ")");
 
@@ -212,6 +216,26 @@ public class AgentCore {
                 toolArgs = parsed;
             }
 
+            // ── Intelligent Heuristics for Small Models (0.5b / 2b) ─────────
+            // If arguments clearly indicate the tool, override the tool name
+            if (toolArgs.has("old_text") || toolArgs.has("new_text")) {
+                toolName = "edit_file";
+            } else if (toolArgs.has("content") && !"edit_file".equals(toolName)) {
+                toolName = "write_file";
+            } else if (toolArgs.has("query") && !"edit_file".equals(toolName)) {
+                toolName = "search_code";
+            } else if (("list_files".equals(toolName) || "listfiles".equals(toolName)) && toolArgs.has("path")) {
+                String p = toolArgs.optString("path", "");
+                if (p.endsWith(".java") || p.endsWith(".kt") || p.endsWith(".xml") || p.endsWith(".txt") || p.endsWith(".md")) {
+                    toolName = "read_file";
+                }
+            }
+
+            String currentThought = parsed.optString("thought", "").trim();
+            if (!currentThought.isEmpty()) {
+                lastThought = currentThought;
+            }
+
             // If the model produced thought but NO tool:
             if (toolName.isEmpty()) {
                 // Did it explicitly provide an answer or text field?
@@ -231,6 +255,24 @@ public class AgentCore {
                             "Output format: {\"thought\": \"...\", \"tool\": \"edit_file\", \"args\": {\"path\": \"...\", \"old_text\": \"...\", \"new_text\": \"...\"}}"));
                     continue;
                 }
+            }
+
+            // ── Loop Breaker ──────────────────────────────────────────────
+            String callSig = toolName + ":" + toolArgs.toString();
+            if (callSig.equals(lastCallSig)) {
+                repeatCount++;
+                if (repeatCount >= 2) {
+                    // Small model is looping on the same call — break out!
+                    if ("read_file".equals(toolName) || "list_files".equals(toolName) || "search_code".equals(toolName)) {
+                        messages.put(new JSONObject().put("role", "assistant").put("content", llmResponse));
+                        messages.put(new JSONObject().put("role", "user").put("content",
+                                "Stop repeating '" + toolName + "'. Proceed directly to call 'edit_file' to fix the code, or call 'answer'."));
+                        continue;
+                    }
+                }
+            } else {
+                repeatCount = 0;
+                lastCallSig = callSig;
             }
 
             // Check if this is an answer or final response
@@ -261,7 +303,7 @@ public class AgentCore {
                 continue;
             }
 
-            String thought = parsed.optString("thought", "").trim();
+            String thought = currentThought;
             String stepInfo = "Using tool: " + toolName +
                     (toolArgs.has("path") ? " (" + toolArgs.optString("path") + ")" : "");
             if (!thought.isEmpty()) {
@@ -287,7 +329,11 @@ public class AgentCore {
                     PromptBuilder.buildToolResultMessage(toolName, toolResult)));
         }
 
-        onError.accept("Agent reached maximum steps (" + MAX_STEPS + ") without completing.");
+        if (!lastThought.isEmpty()) {
+            onDone.accept(lastThought);
+        } else {
+            onError.accept("Agent reached maximum steps (" + MAX_STEPS + ") without completing.");
+        }
     }
 
     // ─────────────────────────── Private Helpers ─────────────────────────────

@@ -79,7 +79,7 @@ public class PromptBuilder {
      * Build a follow-up message that includes a tool result.
      */
     public static String buildToolResultMessage(String toolName, String toolResult) {
-        return "Tool '" + toolName + "' output:\n```\n" + toolResult + "\n```\n" +
-               "Now provide your next JSON tool call (e.g. edit_file or answer).";
+        return "Tool '" + toolName + "' output:\n```\n" + toolResult + "\n```\n\n" +
+               "NEXT STEP: Analyze the code above. To apply changes, call 'edit_file' with 'path', 'old_text', and 'new_text'. Never repeat the same tool call.";
     }
 }
