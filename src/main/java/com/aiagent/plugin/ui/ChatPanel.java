@@ -249,9 +249,11 @@ public class ChatPanel extends JPanel {
         // Create a placeholder bubble for the agent's response
         currentAgentBubble = appendMessage(MessageBubble.Role.AGENT, "Thinking...");
 
+        // Capture context on EDT before handing off to background thread
+        final AgentContext context = AgentContext.from(project);
+
         Runnable worker = () -> {
             try {
-                AgentContext context = AgentContext.from(project);
                 AgentCore agent = new AgentCore(
                         // onStep
                         stepMsg -> SwingUtilities.invokeLater(() -> {

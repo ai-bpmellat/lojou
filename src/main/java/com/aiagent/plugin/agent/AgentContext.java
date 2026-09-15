@@ -23,29 +23,38 @@ public class AgentContext {
 
     /** Build context from the currently active project state. */
     public static AgentContext from(Project project) {
-        String projectPath = project.getBasePath() != null
+        String projectPath = (project != null && project.getBasePath() != null)
                 ? project.getBasePath()
                 : System.getProperty("user.home");
 
-        String currentFile = null;
-        String selection   = null;
+        final String[] currentFile = {null};
+        final String[] selection   = {null};
 
-        try {
-            FileEditorManager fem = FileEditorManager.getInstance(project);
-            VirtualFile[] openFiles = fem.getSelectedFiles();
-            if (openFiles.length > 0) {
-                currentFile = openFiles[0].getPath();
-            }
+        if (project != null && !project.isDisposed()) {
+            try {
+                com.intellij.openapi.application.ApplicationManager.getApplication().runReadAction(() -> {
+                    try {
+                        if (project.isDisposed()) return;
+                        FileEditorManager fem = FileEditorManager.getInstance(project);
+                        VirtualFile[] openFiles = fem.getSelectedFiles();
+                        if (openFiles != null && openFiles.length > 0 && openFiles[0] != null) {
+                            currentFile[0] = openFiles[0].getPath();
+                        }
 
-            Editor editor = fem.getSelectedTextEditor();
-            if (editor != null) {
-                selection = editor.getSelectionModel().getSelectedText();
+                        Editor editor = fem.getSelectedTextEditor();
+                        if (editor != null && editor.getSelectionModel() != null) {
+                            selection[0] = editor.getSelectionModel().getSelectedText();
+                        }
+                    } catch (Throwable ignored) {
+                        // Safe fallback - context is optional
+                    }
+                });
+            } catch (Throwable ignored) {
+                // Safe fallback - context is optional
             }
-        } catch (Exception ignored) {
-            // Safe fallback - context is optional
         }
 
-        return new AgentContext(projectPath, currentFile, selection);
+        return new AgentContext(projectPath, currentFile[0], selection[0]);
     }
 
     public String getProjectPath()     { return projectPath; }
