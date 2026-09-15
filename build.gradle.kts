@@ -20,6 +20,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+sourceSets {
+    main {
+        java {
+            exclude("test/**")
+        }
+    }
+}
+
 intellij {
     pluginName.set("offAiAgent")
     version.set(providers.gradleProperty("platformVersion").get())

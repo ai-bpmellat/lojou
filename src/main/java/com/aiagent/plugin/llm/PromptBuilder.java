@@ -53,7 +53,7 @@ public class PromptBuilder {
                "}\n" +
                "```\n\n" +
                "## Rules\n" +
-               "- Fast Action Rule: Take action directly in Step 1. If asked to write or edit a file, call `write_file` or `edit_file` IMMEDIATELY without extra `read_file` or `search_code` steps unless required.\n" +
+               "- Fast Action Rule: Take action directly in Step 1. If creating a new file, call `write_file` immediately. If editing an existing file whose exact code you haven't seen, call `read_file` first to inspect the lines to change, or use `write_file` with the complete code.\n" +
                "- Java Package Rule: ALWAYS include the correct `package <name>;` declaration at the very top of any Java file, matching its directory under `src/main/java/` (e.g. `package test;` for `src/main/java/test/BST.java`). Never omit package statements.\n" +
                "- Keep \"thought\" extremely concise (1 short sentence) to save token processing time.\n" +
                "- Inside JSON strings (like `content`), properly escape newlines as \\n and quotes as \\\".\n" +
