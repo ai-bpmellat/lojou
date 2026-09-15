@@ -28,10 +28,10 @@ public class PluginSettings implements PersistentStateComponent<PluginSettings.S
         public int serverPort = 8787;
 
         /** Context size in tokens */
-        public int contextSize = 8192;
+        public int contextSize = 16384;
 
-        /** Number of CPU threads */
-        public int threads = 4;
+        /** Number of CPU threads (optimal for i7/i9 P-cores) */
+        public int threads = 8;
 
         /** GPU layers to offload (0 = CPU only) */
         public int gpuLayers = 0;

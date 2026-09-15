@@ -21,6 +21,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.2</b>
+        <ul>
+            <li>Dynamic 16K context window allocation and CPU thread limits in Ollama</li>
+            <li>Automatic context window pruning preventing HTTP 400 exceed_context_size errors</li>
+            <li>Optimized 8-thread default matching modern multi-core CPUs</li>
+        </ul>
         <b>1.0.1</b>
         <ul>
             <li>Smart cursor line and selected code window injection for instant targeted editing</li>

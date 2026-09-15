@@ -178,9 +178,20 @@ public class AgentCore {
             try {
                 llmResponse = LlamaClient.chat(messages);
             } catch (Exception e) {
-                onError.accept("[Error] LLM call failed: " + e.getMessage());
-                LOG.error("LLM call failed", e);
-                return;
+                if (e.getMessage() != null && e.getMessage().contains("exceeds the available context size") && messages.length() > 2) {
+                    pruneMessages(messages);
+                    try {
+                        llmResponse = LlamaClient.chat(messages);
+                    } catch (Exception e2) {
+                        onError.accept("[Error] LLM call failed: " + e2.getMessage());
+                        LOG.error("LLM call failed after prune", e2);
+                        return;
+                    }
+                } else {
+                    onError.accept("[Error] LLM call failed: " + e.getMessage());
+                    LOG.error("LLM call failed", e);
+                    return;
+                }
             }
 
             // ── Parse JSON from LLM response ──────────────────────────────
@@ -525,6 +536,22 @@ public class AgentCore {
             return root;
         } catch (Exception ignored) {
             return null;
+        }
+    }
+
+    /**
+     * Prunes older messages in history to fit context size when an exceed error occurs.
+     */
+    private void pruneMessages(org.json.JSONArray messages) {
+        int lastIdx = messages.length() - 1;
+        for (int i = 2; i < lastIdx; i++) {
+            JSONObject msg = messages.optJSONObject(i);
+            if (msg != null && "user".equals(msg.optString("role"))) {
+                String c = msg.optString("content", "");
+                if (c.length() > 600) {
+                    msg.put("content", c.substring(0, 500) + "\n... [Output trimmed to fit context window] ...");
+                }
+            }
         }
     }
 }

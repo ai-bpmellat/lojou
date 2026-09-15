@@ -157,6 +157,17 @@ public class LlamaClient {
         responseFormat.put("type", "json_object");
         body.put("response_format", responseFormat);
 
+        // Options for Ollama & llama.cpp (context size & CPU thread limits)
+        int ctx = Math.max(cfg.contextSize, 16384);
+        int threads = (cfg.threads > 0) ? cfg.threads : 8;
+
+        JSONObject options = new JSONObject();
+        options.put("num_ctx", ctx);
+        options.put("num_thread", threads);
+        options.put("temperature", cfg.temperature);
+        options.put("top_p", cfg.topP);
+        body.put("options", options);
+
         body.put("messages", messages);
         return body;
     }
