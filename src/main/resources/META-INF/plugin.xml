@@ -21,6 +21,14 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.1</b>
+        <ul>
+            <li>Smart cursor line and selected code window injection for instant targeted editing</li>
+            <li>Extended read_file capacity up to 25KB with start_line and end_line slice support</li>
+            <li>Multi-level whitespace & CRLF tolerance in edit_file tool</li>
+            <li>Heuristic tool resolution and loop breaker for small local models</li>
+            <li>Thread-safe EDT context capture preventing ReadAction errors</li>
+        </ul>
         <b>1.0.0</b>
         <ul>
             <li>Native Ollama auto-detection and support</li>
