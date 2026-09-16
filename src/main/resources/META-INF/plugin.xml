@@ -7,20 +7,28 @@
         <h2>AI Agent - Offline Coding Assistant</h2>
         <p>
             A fully offline AI coding agent powered by <b>Ollama</b> or <b>llama.cpp</b>.
-            No internet connection required. Your code never leaves your machine.
+            No internet connection required. Your code and database queries never leave your machine.
         </p>
 
         <h3>Features:</h3>
         <ul>
             <li><b>Chat Interface</b>: Talk to your AI agent naturally</li>
-            <li><b>Code Generation & Refactoring</b>: Agent writes and edits code files</li>
-            <li><b>Project Awareness</b>: Agent reads your project structure</li>
+            <li><b>DataGrip & SQL Support</b>: Inspect, write, optimize, and refactor SQL queries, DDL schemas, and migrations</li>
+            <li><b>Code Generation & Refactoring</b>: Agent writes and edits code and database script files</li>
+            <li><b>Project & Schema Awareness</b>: Agent reads project structure, SQL scripts, and surrounding queries</li>
             <li><b>100% Offline</b>: Local inference with Ollama or GGUF models</li>
             <li><b>Agentic Tools</b>: Read, write, edit, search, and list files</li>
+            <li><b>Broad IDE Compatibility</b>: Works seamlessly in IntelliJ IDEA, DataGrip, and IntelliJ Platform IDEs</li>
         </ul>
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.0.4</b>
+        <ul>
+            <li>Added full DataGrip compatibility for working with SQL and database scripts</li>
+            <li>Added SQL-aware prompt guidance, query optimization, and DDL/DML editing examples</li>
+            <li>Added context menu actions to EditorPopupMenu and ConsoleEditorPopupMenu for rapid SQL access</li>
+        </ul>
         <b>1.0.3</b>
         <ul>
             <li>Fixed context prune loop covering all tool responses and large messages</li>
@@ -85,6 +93,8 @@
             description="Open the offAiAgent chat window"
             icon="/icons/pluginIcon.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>
         </action>
 

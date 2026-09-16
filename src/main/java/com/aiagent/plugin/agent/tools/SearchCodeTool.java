@@ -24,7 +24,7 @@ public class SearchCodeTool implements AgentTool {
     private static final List<String> SEARCHABLE_EXTENSIONS = List.of(
             ".java", ".kt", ".groovy", ".xml", ".json", ".yaml", ".yml",
             ".properties", ".txt", ".md", ".py", ".js", ".ts", ".html",
-            ".css", ".scss", ".gradle", ".kts", ".toml", ".sql"
+            ".css", ".scss", ".gradle", ".kts", ".toml", ".sql", ".ddl", ".dml"
     );
 
     /** Directories to skip */

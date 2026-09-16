@@ -95,6 +95,26 @@ public class AgentContext {
         return null;
     }
 
+    public boolean isSqlFile() {
+        if (currentFilePath == null) return false;
+        String lower = currentFilePath.toLowerCase();
+        return lower.endsWith(".sql") || lower.endsWith(".ddl") || lower.endsWith(".dml") || lower.contains("console");
+    }
+
+    public String getCodeBlockLanguage() {
+        if (isSqlFile()) return "sql";
+        if (currentFilePath != null) {
+            String lower = currentFilePath.toLowerCase();
+            if (lower.endsWith(".kt")) return "kotlin";
+            if (lower.endsWith(".py")) return "python";
+            if (lower.endsWith(".js") || lower.endsWith(".ts")) return "javascript";
+            if (lower.endsWith(".json")) return "json";
+            if (lower.endsWith(".xml")) return "xml";
+            if (lower.endsWith(".html")) return "html";
+        }
+        return "java";
+    }
+
     public boolean hasSelectedText() {
         return selectedText != null && !selectedText.trim().isEmpty();
     }

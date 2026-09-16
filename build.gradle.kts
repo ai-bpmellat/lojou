@@ -13,6 +13,7 @@ repositories {
 dependencies {
     // JSON parsing
     implementation("org.json:json:20231013")
+    testImplementation("junit:junit:4.13.2")
 }
 
 java {
@@ -32,7 +33,12 @@ intellij {
     pluginName.set("offAiAgent")
     version.set(providers.gradleProperty("platformVersion").get())
     type.set(providers.gradleProperty("platformType").get())
-    plugins.set(listOf())
+    val configuredPlugins = providers.gradleProperty("platformPlugins").orNull
+    if (!configuredPlugins.isNullOrBlank()) {
+        plugins.set(configuredPlugins.split(",").map { it.trim() }.filter { it.isNotEmpty() })
+    } else {
+        plugins.set(listOf())
+    }
     downloadSources.set(false)
 }
 

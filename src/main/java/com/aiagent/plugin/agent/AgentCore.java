@@ -154,12 +154,13 @@ public class AgentCore {
 
         // Build rich user prompt with context (selection & cursor line window)
         StringBuilder fullMsg = new StringBuilder(userMessage);
+        String langTag = context.getCodeBlockLanguage();
         if (context.hasSelectedText()) {
-            fullMsg.append("\n\n**Selected Code in Editor (line ").append(context.getCursorLine()).append("):**\n```java\n")
+            fullMsg.append("\n\n**Selected Code in Editor (line ").append(context.getCursorLine()).append("):**\n```").append(langTag).append("\n")
                    .append(context.getSelectedText()).append("\n```\n")
                    .append("INSTRUCTION: The user specifically selected this code block to fix/edit. Call 'edit_file' directly on this block.");
         } else if (context.hasSurroundingCode()) {
-            fullMsg.append("\n\n**Focused Code around Cursor (line ").append(context.getCursorLine()).append("):**\n```java\n")
+            fullMsg.append("\n\n**Focused Code around Cursor (line ").append(context.getCursorLine()).append("):**\n```").append(langTag).append("\n")
                    .append(context.getSurroundingCode()).append("\n```\n")
                    .append("INSTRUCTION: The user's cursor is around line ").append(context.getCursorLine()).append(". Focus your fix on this section.");
         }
