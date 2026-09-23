@@ -1,4 +1,4 @@
-# ⚡ OffAI (offAiAgent)
+# ⚡ OffAI (lojou)
 
 > **Autonomous, 100% Private Offline AI Coding Assistant for IntelliJ IDEA**  
 > Powered by local LLMs via **Ollama** or **llama.cpp (GGUF)**. Zero cloud telemetry. Zero subscriptions. Completely free.
@@ -37,12 +37,12 @@ Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, OffAI does no
 
 ## 🚀 Quick Start: Installing the Plugin
 
-1. Download the latest `offAiAgent-1.0.0.zip` from [Releases](https://github.com/saeedaliakbari/offai/releases) (or build it locally).
+1. Download the latest `lojou-1.0.0.zip` from [Releases](https://github.com/saeedaliakbari/offai/releases) (or build it locally).
 2. In IntelliJ IDEA, go to **Settings** (`Ctrl + Alt + S`) → **Plugins**.
 3. Click the gear icon ⚙️ at the top right and select **Install Plugin from Disk...**.
-4. Choose the `offAiAgent-1.0.0.zip` file and click **OK**.
+4. Choose the `lojou-1.0.0.zip` file and click **OK**.
 5. Restart IntelliJ IDEA.
-6. Open the tool window by clicking **offAiAgent** on the right sidebar or press `Ctrl + Alt + A`.
+6. Open the tool window by clicking **lojou** on the right sidebar or press `Ctrl + Alt + A`.
 
 ---
 
@@ -200,7 +200,7 @@ cd offai
 
 The output artifact will be generated in:
 ```text
-build/distributions/offAiAgent-1.0.0.zip
+build/distributions/lojou-1.0.0.zip
 ```
 
 ---

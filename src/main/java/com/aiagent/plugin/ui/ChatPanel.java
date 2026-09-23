@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
- * Main chat panel for offAiAgent Tool Window.
+ * Main chat panel for lojou Tool Window.
  */
 public class ChatPanel extends JPanel {
 
@@ -40,7 +40,7 @@ public class ChatPanel extends JPanel {
     private synchronized ExecutorService getExecutor() {
         if (executor == null || executor.isShutdown() || executor.isTerminated()) {
             executor = Executors.newSingleThreadExecutor(r -> {
-                Thread t = new Thread(r, "offaiagent-worker");
+                Thread t = new Thread(r, "lojou-worker");
                 t.setDaemon(true);
                 return t;
             });
@@ -88,7 +88,7 @@ public class ChatPanel extends JPanel {
 
         // ── Welcome message ────────────────────────────────────────────────
         appendMessage(MessageBubble.Role.SYSTEM,
-                "offAiAgent is ready! (Offline Mode)\n\n" +
+                "lojou is ready! (Offline Mode)\n\n" +
                 "Type your request and press Send or Ctrl+Enter.\n\n" +
                 "Examples:\n" +
                 "  • Write a Java class for a binary search tree\n" +
@@ -120,7 +120,7 @@ public class ChatPanel extends JPanel {
         dot.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
         titleBox.add(dot);
 
-        JLabel title = new JLabel("offAiAgent");
+        JLabel title = new JLabel("lojou");
         title.setForeground(ThemeColors.TITLE_TEXT);
         title.setFont(new Font("JetBrains Mono", Font.BOLD, 12));
         titleBox.add(title);
@@ -139,7 +139,7 @@ public class ChatPanel extends JPanel {
         ModernButton settingsButton = new ModernButton("⚙ Settings",
                 ThemeColors.SETTINGS_BTN_BG, ThemeColors.SETTINGS_BTN_HOVER,
                 ThemeColors.SETTINGS_BTN_FG, ThemeColors.SETTINGS_BTN_BORDER, 6);
-        settingsButton.setToolTipText("Open offAiAgent configuration");
+        settingsButton.setToolTipText("Open lojou configuration");
         settingsButton.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
         settingsButton.setBorder(new EmptyBorder(3, 8, 3, 8));
         settingsButton.addActionListener(e -> {

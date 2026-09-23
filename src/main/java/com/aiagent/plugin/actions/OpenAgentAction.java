@@ -20,7 +20,7 @@ public class OpenAgentAction extends AnAction {
             return;
         }
         ToolWindow toolWindow = ToolWindowManager.getInstance(project)
-                .getToolWindow("offAiAgent");
+                .getToolWindow("lojou");
         if (toolWindow != null) {
             toolWindow.show(null);
         }

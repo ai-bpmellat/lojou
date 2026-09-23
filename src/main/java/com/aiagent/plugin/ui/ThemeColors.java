@@ -35,7 +35,7 @@ public final class ThemeColors {
     public static final JBColor INPUT_BORDER = new JBColor(new Color(0xCBD5E1), new Color(0x2D3039));
 
     // ─── Text & Typography ────────────────────────────────────────────────────
-    /** Primary title ("offAiAgent") */
+    /** Primary title ("lojou") */
     public static final JBColor TITLE_TEXT = new JBColor(new Color(0x1E293B), new Color(0xC084FC));
 
     /** Muted labels (Offline status, status text) */

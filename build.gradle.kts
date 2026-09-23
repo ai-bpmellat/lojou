@@ -30,7 +30,7 @@ sourceSets {
 }
 
 intellij {
-    pluginName.set("offAiAgent")
+    pluginName.set("lojou")
     version.set(providers.gradleProperty("platformVersion").get())
     type.set(providers.gradleProperty("platformType").get())
     val configuredPlugins = providers.gradleProperty("platformPlugins").orNull
@@ -53,7 +53,7 @@ tasks {
     }
 
     buildPlugin {
-        archiveFileName.set("offAiAgent-${version}.zip")
+        archiveFileName.set("lojou-${version}.zip")
     }
 
     compileJava {

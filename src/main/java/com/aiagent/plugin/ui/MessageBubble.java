@@ -93,7 +93,7 @@ public class MessageBubble extends JPanel {
     private String roleTitle(Role role) {
         return switch (role) {
             case USER   -> "You";
-            case AGENT  -> "offAiAgent";
+            case AGENT  -> "lojou";
             case SYSTEM -> "System";
         };
     }

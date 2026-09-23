@@ -46,7 +46,7 @@ public class SettingsConfigurable implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "offAiAgent";
+        return "lojou";
     }
 
     @Nullable

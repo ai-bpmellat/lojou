@@ -21,7 +21,7 @@ public class PromptBuilder {
                 : (isSql ? "console.sql" : "src/main/java/test/BST.java");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("You are offAiAgent, an expert autonomous offline AI coding assistant embedded inside JetBrains IDEs (DataGrip, IntelliJ IDEA).\n");
+        sb.append("You are lojou, an expert autonomous offline AI coding assistant embedded inside JetBrains IDEs (DataGrip, IntelliJ IDEA).\n");
         sb.append("Your goal is to inspect, write, refactor, and edit code and SQL database scripts directly in the user's workspace.\n\n");
         sb.append("## Current IDE State\n");
         sb.append("- Project root: ").append(projectPath).append("\n");

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.aiagent.plugin</id>
-    <name>offAiAgent</name>
-    <vendor email="support@aiagent.dev" url="https://github.com/aiagent-plugin">offAiAgent</vendor>
+    <name>lojou</name>
+    <vendor email="support@aiagent.dev" url="https://github.com/aiagent-plugin">lojou</vendor>
 
     <description><![CDATA[
         <h2>AI Agent - Offline Coding Assistant</h2>
@@ -61,24 +61,24 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Tool Window -->
         <toolWindow
-            id="offAiAgent"
-            displayName="offAiAgent"
+            id="lojou"
+            displayName="lojou"
             anchor="right"
             factoryClass="com.aiagent.plugin.ui.AgentToolWindowFactory"
             icon="/icons/pluginIcon.svg"/>
 
-        <!-- Settings: File -> Settings -> Tools -> offAiAgent -->
+        <!-- Settings: File -> Settings -> Tools -> lojou -->
         <projectConfigurable
             groupId="tools"
             instance="com.aiagent.plugin.settings.SettingsConfigurable"
             id="com.aiagent.plugin.settings"
-            displayName="offAiAgent"/>
+            displayName="lojou"/>
 
         <applicationConfigurable
             groupId="tools"
             instance="com.aiagent.plugin.settings.SettingsConfigurable"
             id="com.aiagent.plugin.settings.app"
-            displayName="offAiAgent"/>
+            displayName="lojou"/>
 
         <!-- Persistent State -->
         <applicationService
@@ -89,8 +89,8 @@
         <action
             id="AIAgent.OpenWindow"
             class="com.aiagent.plugin.actions.OpenAgentAction"
-            text="offAiAgent"
-            description="Open the offAiAgent chat window"
+            text="lojou"
+            description="Open the lojou chat window"
             icon="/icons/pluginIcon.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
@@ -101,8 +101,8 @@
         <action
             id="AIAgent.OpenSettings"
             class="com.aiagent.plugin.actions.OpenSettingsAction"
-            text="offAiAgent Settings..."
-            description="Open offAiAgent settings configuration">
+            text="lojou Settings..."
+            description="Open lojou settings configuration">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
