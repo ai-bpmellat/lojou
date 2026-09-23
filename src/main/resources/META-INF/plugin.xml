@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.aiagent.plugin</id>
     <name>lojou</name>
-    <vendor email="support@aiagent.dev" url="https://github.com/aiagent-plugin">lojou</vendor>
+    <vendor email="support@lojou.dev" url="https://github.com/saeedaliakbari/lojou">lojou</vendor>
 
     <description><![CDATA[
         <h2>AI Agent - Offline Coding Assistant</h2>

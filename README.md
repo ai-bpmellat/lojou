@@ -1,4 +1,4 @@
-# ⚡ OffAI (lojou)
+# ⚡ lojou
 
 > **Autonomous, 100% Private Offline AI Coding Assistant for IntelliJ IDEA**  
 > Powered by local LLMs via **Ollama** or **llama.cpp (GGUF)**. Zero cloud telemetry. Zero subscriptions. Completely free.
@@ -13,9 +13,9 @@
 
 ## 🌟 Overview
 
-**OffAI** is an embedded AI programming partner directly inside **IntelliJ IDEA**. Unlike cloud-based assistants (Copilot, Cursor, etc.), OffAI executes **entirely on your local machine** using either **Ollama** or **llama.cpp**. Your proprietary codebase never leaves your computer.
+**lojou** is an embedded AI programming partner directly inside **IntelliJ IDEA**. Unlike cloud-based assistants (Copilot, Cursor, etc.), lojou executes **entirely on your local machine** using either **Ollama** or **llama.cpp**. Your proprietary codebase never leaves your computer.
 
-Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, OffAI does not just write code snippets in chat—it can read your workspace, create new classes, apply surgical diffs to existing files, search patterns, and organize directory trees.
+Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, lojou does not just write code snippets in chat—it can read your workspace, create new classes, apply surgical diffs to existing files, search patterns, and organize directory trees.
 
 ---
 
@@ -28,7 +28,7 @@ Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, OffAI does no
   - `edit_file`: Applies targeted search-and-replace edits without rewriting whole files.
   - `list_files`: Navigates project structures and directory trees.
   - `search_code`: Fast text pattern search across the workspace.
-- 🎯 **Smart Java Package Deduction**: Automatically analyzes your project's `src/main/java` structure. If an LLM forgets or misplaces a package declaration, OffAI auto-detects and inserts the correct `package <name>;` statement automatically.
+- 🎯 **Smart Java Package Deduction**: Automatically analyzes your project's `src/main/java` structure. If an LLM forgets or misplaces a package declaration, lojou auto-detects and inserts the correct `package <name>;` statement automatically.
 - 🎨 **Adaptive Dynamic Theme**: Automatically mirrors IntelliJ IDEA's active Look & Feel (pure white minimalist light mode or luxury obsidian dark mode) with live real-time switching without restarts.
 - ⚡ **Dual Engine Flexibility**: Native integration with **Ollama** (via REST) and **llama.cpp** (`llama-server.exe` with auto-spawn lifecycle).
 - 🛡 **Resilient Parsing Engine**: Self-healing JSON parser handles raw unescaped newlines and repairs truncated model outputs automatically.
@@ -37,7 +37,7 @@ Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, OffAI does no
 
 ## 🚀 Quick Start: Installing the Plugin
 
-1. Download the latest `lojou-1.0.0.zip` from [Releases](https://github.com/saeedaliakbari/offai/releases) (or build it locally).
+1. Download the latest `lojou-1.0.0.zip` from [Releases](https://github.com/saeedaliakbari/lojou/releases) (or build it locally).
 2. In IntelliJ IDEA, go to **Settings** (`Ctrl + Alt + S`) → **Plugins**.
 3. Click the gear icon ⚙️ at the top right and select **Install Plugin from Disk...**.
 4. Choose the `lojou-1.0.0.zip` file and click **OK**.
@@ -48,7 +48,7 @@ Equipped with an autonomous **ReAct (Reasoning + Acting)** engine, OffAI does no
 
 ## ⚙️ Backend Setup Guide
 
-OffAI supports two local engines. Choose the one that best fits your workflow:
+lojou supports two local engines. Choose the one that best fits your workflow:
 
 ---
 
@@ -74,7 +74,7 @@ ollama run gemma4:e4b
 ```
 
 #### 3. Connect in IntelliJ IDEA
-1. Open IntelliJ IDEA and open the OffAI tool window (`Ctrl + Alt + A`).
+1. Open IntelliJ IDEA and open the lojou tool window (`Ctrl + Alt + A`).
 2. Click **⚙ Settings** in the toolbar (or **Settings → Tools → AI Agent**).
 3. Select **Ollama**, make sure port is `11434`, click **Refresh Models**, select your model, and click **Apply**.
 
@@ -125,7 +125,7 @@ ollama run my-custom-model "Write a binary search in Java"
 ```
 
 #### Step 5: Use it inside IntelliJ IDEA
-In the OffAI plugin header, click **⚙ Settings** → **Refresh Models**. Your `my-custom-model` will appear in the dropdown list!
+In the lojou plugin header, click **⚙ Settings** → **Refresh Models**. Your `my-custom-model` will appear in the dropdown list!
 
 ---
 
@@ -148,7 +148,7 @@ If you prefer lightweight standalone binaries without running the Ollama service
    - **Model (.gguf) Path:** `C:\AI\models\qwen2.5-coder-7b-instruct-q4_k_m.gguf`
    - **CPU Threads:** `4` (or number of your physical CPU cores).
    - **GPU Layers:** `0` (CPU-only) or `33`+ (to offload layers to your GPU VRAM).
-   - Check **Auto-start server** or click **Test Connection**. OffAI manages starting and stopping the server automatically!
+   - Check **Auto-start server** or click **Test Connection**. lojou manages starting and stopping the server automatically!
 
 ---
 
@@ -166,7 +166,7 @@ In the chat panel, simply instruct the agent using natural language:
 ### Shortcuts
 - `Ctrl + Enter` (or `Cmd + Enter`): Send message
 - `Shift + Enter`: Insert a newline inside the message box
-- `Ctrl + Alt + A`: Toggle the OffAI Tool Window
+- `Ctrl + Alt + A`: Toggle the lojou Tool Window
 
 ---
 
@@ -187,8 +187,8 @@ To build the plugin yourself:
 
 ```bash
 # Clone the repository
-git clone https://github.com/saeedaliakbari/offai.git
-cd offai
+git clone https://github.com/saeedaliakbari/lojou.git
+cd lojou
 
 # Build plugin ZIP using Gradle
 # Windows:
@@ -207,7 +207,7 @@ build/distributions/lojou-1.0.0.zip
 
 ## 🇮🇷 راهنمای فارسی (Persian Quick Guide)
 
-پلاگین **OffAI** یک دستیار هوش مصنوعی ۱۰۰٪ آفلاین و رایگان برای محیط IntelliJ IDEA است.
+پلاگین **lojou** یک دستیار هوش مصنوعی ۱۰۰٪ آفلاین و رایگان برای محیط IntelliJ IDEA است.
 
 ### نحوه افزودن مدل GGUF دانلود شده به Ollama در ویندوز:
 ۱. فایل `.gguf` دلخواه خود را دانلود کنید (مثلاً در مسیر `C:\models\my-model.gguf`).  
